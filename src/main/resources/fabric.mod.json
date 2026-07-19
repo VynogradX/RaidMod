@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "raidmod",
+  "version": "${version}",
+  "name": "RaidMod",
+  "description": "Server-side timed Nether expeditions with configurable spawns, rotating exits, statistics and cooperative raids.",
+  "authors": ["Hanset"],
+  "contact": {
+    "homepage": "https://github.com/VynogradX/RaidMod",
+    "sources": "https://github.com/VynogradX/RaidMod",
+    "issues": "https://github.com/VynogradX/RaidMod/issues"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/raidmod/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": ["com.hanset.raidmod.RaidMod"]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.3",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*"
+  }
+}
