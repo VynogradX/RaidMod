@@ -92,6 +92,3 @@ Additional values can be changed in the configuration or through the `/expeditio
 
 Back up the world and configuration before updating.
 
-## License
-
-CC0-1.0
