@@ -1,0 +1,22 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="CC0-1.0"
+[[mods]]
+modId="raidmod"
+version="1.0.0"
+displayName="RaidMod"
+authors="Hanset"
+description="Server-side timed Nether expeditions."
+[[dependencies.raidmod]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.227,)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.raidmod]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.21.2)"
+ordering="NONE"
+side="BOTH"
+

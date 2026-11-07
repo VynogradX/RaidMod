@@ -1,94 +1,87 @@
-# RaidMod
+# RaidMod для NeoForge 1.21.1
 
-[English](#english) · [Русский](#русский)
+RaidMod превращает Незер в зону экспедиций с ограниченным временем. Рейд начинается командой `/expedition`, а не при прохождении обычного портала. Игроки ищут активный выход и покидают рейд до окончания таймера. Есть совместные рейды, смена выходов, статистика и настройки сервера.
 
-## Русский
+## Требования и установка
 
-RaidMod — серверный мод для Fabric 1.20.1, превращающий Nether в зону ограниченных по времени экспедиций. Обычный портал работает как обычно и не начинает экспедицию. Рейд запускается только командой `/expedition`.
+- Minecraft Java Edition 1.21.1 и сервер NeoForge 21.1.227 или новее из серии 21.1.
+- Java 21.
+- Файл `raidmod-neoforge-1.0.0.jar` в папке `mods` сервера. Fabric API не требуется.
 
-### Возможности
+Установите NeoForge сервер, примите EULA и запустите его хотя бы один раз. Остановите сервер, поместите JAR мода в `mods` и запустите сервер снова. Затем настройте точки появления и выходы командами ниже. Мод не добавляет клиентских предметов и блоков.
 
-- одиночные и совместные экспедиции с подтверждением;
-- настраиваемые точки появления и их кулдауны;
-- постоянные и автоматически меняющиеся выходы;
-- bossbar, sidebar, таймер выхода и частицы;
-- сохранение активных экспедиций после перезапуска;
-- статистика, таблицы лидеров, убийства и успешные выходы;
-- серверная установка — клиентам мод не требуется;
-- поддержка OP и необязательных permissions `raidmod.admin` и `raidmod.cooldown.bypass`.
+Готовый JAR можно собрать из исходников: в корне проекта выполните `./gradlew build` (Linux/macOS) или `gradlew.bat build` (Windows). Результат находится в `build/libs`; файл с суффиксом `-sources` предназначен для разработки и не является игровым модом. Для запуска тестового сервера разработчика используйте `./gradlew runServer` и примите EULA в `run/eula.txt`.
 
-### Установка
+## Первичная настройка
 
-1. Установите Fabric Loader и Fabric API для Minecraft 1.20.1.
-2. Поместите JAR RaidMod в серверную папку `mods`.
-3. Запустите сервер. Конфиги будут созданы в папке `config`.
-4. Создайте точки входа и выходные двери административными командами.
+1. Выдайте себе OP уровня 2 или выше. Выберите безопасные координаты в Незере и создайте точки появления, например `/expedition spawncreate 100 70 -30 Север`. Координаты всегда относятся к Незеру. Создайте несколько точек, чтобы рейды не упирались в кулдаун одной точки.
+2. В Незере установите обычную дверь, подойдите к ней на расстояние до пяти блоков и наведите на неё прицел. Выполните `/expedition doorcreate 4 10 false Ворота`. Числа означают радиус активации в блоках и время выхода в секундах. `false` обозначает одиночный выход, `true` требует двух игроков.
+3. Создайте другие двери аналогично. Чтобы назначить дверь постоянным выходом, посмотрите на неё и выполните `/expedition doorstatic`. Повторная команда снимает отметку. Остальные двери участвуют в ротации. Обновить выбор можно командой `/expedition variableexitsrefresh`.
+4. В обычном мире выполните `/expedition`, затем подтвердите действие через сообщение или `/expedition confirm`. Проверьте появление, таймер, список выходов и возвращение через дверь.
 
-### Основные команды
+Время в рейде по умолчанию 60 секунд. Если оно истечёт, игрок погибнет. Убедитесь, что путь от каждой точки появления до выхода проходим за отведённое время.
 
-- `/expedition` — запросить одиночную экспедицию;
-- `/expedition with <игрок>` — совместная экспедиция;
-- `/expedition confirm`, `/expedition cancel` — подтвердить или отменить;
-- `/expedition stat [игрок]` — статистика;
-- `/expedition top <expedition|kill>` — таблица лидеров;
-- `/expedition spawncreate <x> <y> <z> <название>` — создать точку появления;
-- `/expedition spawnremove <название>`, `spawnlist`, `spawnclear`;
-- `/expedition doorcreate <радиус> <время> <shared> <название>` — создать выход;
-- `/expedition doorstatic`, `doorremove`, `doorclear`;
-- `/expedition availableexits <количество>` — изменить число активных переменных выходов;
-- `/expedition addtime`, `addtimeclear`, `nocd`, `nocdremove` — исключения для игроков;
-- `/expedition open`, `/expedition close`, `/expedition reload`.
+## Команды игрока
 
-Остальные параметры можно менять в конфиге или административными подкомандами `/expedition`.
+| Команда | Действие |
+| --- | --- |
+| `/expedition` | Запрос одиночной экспедиции. |
+| `/expedition with <игрок>` | Запрос совместной экспедиции с указанным игроком. |
+| `/expedition confirm` | Подтвердить ожидающий запрос. |
+| `/expedition cancel` | Отменить ожидающий запрос. |
+| `/expedition stat [игрок]` | Показать статистику. |
+| `/expedition top expedition` | Таблица лидеров по экспедициям. |
+| `/expedition top kill` | Таблица лидеров по убийствам. |
 
-### Конфигурация
+Рейд нельзя запустить из Незера. Для входа нужна свободная точка появления. При совместном рейде оба игрока должны подтвердить запрос. Обычный портал не запускает таймер.
 
-`raidmod.json` управляет длительностью, кулдаунами, количеством доступных выходов, ротацией, sidebar, bossbar, частицами и поведением при отключении. `raidmod_messages.json` содержит все отображаемые тексты. Цвета задаются стандартными кодами Minecraft `§`.
+## Команды администратора
 
-Перед обновлением рекомендуется сделать резервную копию мира и конфигов.
+Для административных команд нужен OP уровня 2 либо permission `raidmod.admin`, если установлен LuckPerms.
 
-## English
+| Команда | Действие |
+| --- | --- |
+| `/expedition spawncreate <x> <y> <z> <название>` | Создать точку появления в Незере. |
+| `/expedition spawnlist` | Показать точки. |
+| `/expedition spawnremove <название>` | Удалить точку по названию. |
+| `/expedition spawnclear` | Удалить все точки. |
+| `/expedition doorcreate <радиус> <секунды> <true\|false> <название>` | Зарегистрировать дверь, на которую смотрит игрок. Радиус 1–16, время 1–120 секунд. |
+| `/expedition doorstatic` | Переключить постоянный статус двери под прицелом. |
+| `/expedition doorremove` | Удалить дверь под прицелом из списка выходов. |
+| `/expedition doorclear` | Удалить все выходы. |
+| `/expedition timeraid <секунды>` | Установить длительность рейда. |
+| `/expedition servercooldown <секунды>` | Установить задержку между рейдами игрока. |
+| `/expedition spawncooldown <секунды>` | Установить задержку повторного использования точки. |
+| `/expedition spawncooldownclear` | Сбросить задержки точек. |
+| `/expedition variableexitsinterval <секунды>` | Изменить интервал ротации, минимум 60 секунд. |
+| `/expedition availableexits <число>` | Изменить число активных переменных выходов, от 1 до 14. |
+| `/expedition variableexitsrefresh` | Перевыбрать переменные выходы. |
+| `/expedition open`, `/expedition close` | Открыть или закрыть экспедиции для игроков. |
+| `/expedition hidenametags <true\|false>` | Включить или выключить скрытие имён в Незере. |
+| `/expedition addtime <игрок> <секунды>` | Добавить игроку время рейда. |
+| `/expedition addtimeclear <игрок>` | Убрать дополнительное время. |
+| `/expedition nocd <игрок>`, `/expedition nocdremove <игрок>` | Добавить или убрать игрока из исключений задержки рейда. |
+| `/expedition statclear <игрок\|all>` | Очистить статистику игрока или всех игроков. |
+| `/expedition reload` | Перечитать конфигурацию и сообщения. |
 
-RaidMod is a server-side Fabric 1.20.1 mod that turns the Nether into a timed expedition zone. Vanilla Nether portals continue to work and do not start an expedition. A raid starts only through `/expedition`.
+## Конфигурация
 
-### Features
+Файлы находятся в `config`. При первом использовании создаются значения по умолчанию. Изменяйте JSON с сохранением синтаксиса, затем выполните `/expedition reload`.
 
-- confirmed solo and cooperative expeditions;
-- configurable spawn points and cooldowns;
-- permanent and automatically rotating exits;
-- boss bar, sidebar, exit countdown and particles;
-- active expedition persistence across restarts;
-- statistics, leaderboards, kills and successful exits;
-- server-side installation — clients do not need the mod;
-- OP support and optional `raidmod.admin` and `raidmod.cooldown.bypass` permissions.
+- `raidmod.json`: `raid_time_seconds` (60), `raid_cooldown_seconds` (0), `spawn_cooldown_seconds` (300), `variable_exits_interval_seconds` (1800), `available_variable_exits` (2), `confirmation_timeout_seconds` (30), `offline_timeout_seconds` (3600), `spawn_cooldown_pause_radius` (15), `scoreboard_enabled`, `bossbar_enabled`, `exit_particles_enabled`, `scoreboard_update_interval_ticks` (20), `raid_cooldown_bypass_uuids`, `raids_open` и `hide_nether_nametags`.
+- `raidmod_addtime.json`: дополнительные секунды для отдельных UUID.
+- `raidmod_messages.json`: сообщения мода; для цветов используются коды Minecraft с символом `§`. Сохраняйте заполнители вроде `%s` в переводимых строках.
 
-### Installation
+Право `raidmod.cooldown.bypass` обходит задержку рейда. Её также обходят OP уровня 3 и UUID в `raid_cooldown_bypass_uuids`. Консоль имеет доступ к административным командам, но команды, требующие прицеливания на дверь или игрока, выполняются в игре.
 
-1. Install Fabric Loader and Fabric API for Minecraft 1.20.1.
-2. Put the RaidMod JAR into the server `mods` directory.
-3. Start the server. Configuration files are generated in `config`.
-4. Create expedition spawn points and exit doors with the admin commands.
+## Данные и обновление
 
-### Main commands
+Точки и двери хранятся в данных Незера, статистика и активные рейды в данных мира. Конфигурация расположена отдельно в `config`. Перед переходом с Fabric 1.20.1 остановите сервер и сохраните копии всего мира и конфигов. Обновите копию мира средствами Minecraft 1.21.1 и сначала проверьте её на отдельном сервере: координаты точек, выходы, статистику, настройки и восстановление рейда после перезапуска. Не используйте ту же копию мира одновременно с Fabric и NeoForge.
 
-- `/expedition` — request a solo expedition;
-- `/expedition with <player>` — request a cooperative expedition;
-- `/expedition confirm`, `/expedition cancel` — accept or cancel;
-- `/expedition stat [player]` — show statistics;
-- `/expedition top <expedition|kill>` — show leaderboards;
-- `/expedition spawncreate <x> <y> <z> <name>` — create a spawn point;
-- `/expedition spawnremove <name>`, `spawnlist`, `spawnclear`;
-- `/expedition doorcreate <radius> <time> <shared> <name>` — create an exit;
-- `/expedition doorstatic`, `doorremove`, `doorclear`;
-- `/expedition availableexits <count>` — change the number of active rotating exits;
-- `/expedition addtime`, `addtimeclear`, `nocd`, `nocdremove` — player overrides;
-- `/expedition open`, `/expedition close`, `/expedition reload`.
+## Если что-то не работает
 
-Additional values can be changed in the configuration or through the `/expedition` admin subcommands.
-
-### Configuration
-
-`raidmod.json` controls durations, cooldowns, the number of available exits, rotation, sidebar, boss bar, particles and disconnect behavior. `raidmod_messages.json` contains all visible text. Standard Minecraft `§` formatting codes are supported.
-
-Back up the world and configuration before updating.
-
+- Проверьте версию Java, Minecraft и NeoForge, а также журнал `logs/latest.log`.
+- Если рейд не начинается, убедитесь, что он открыт, игрок находится вне Незера и хотя бы одна точка свободна.
+- Если выход не срабатывает, проверьте, что дверь зарегистрирована, активна в текущей ротации и игроки находятся в её радиусе необходимое время.
+- Если команда двери не работает, встаньте в Незере, наведитесь на сам блок двери с расстояния не более пяти блоков и проверьте права.
+- При проблемах после изменения JSON верните файл из копии и выполните `/expedition reload`.

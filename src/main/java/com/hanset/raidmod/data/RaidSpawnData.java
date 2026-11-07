@@ -32,14 +32,14 @@ public class RaidSpawnData extends SavedData {
         super();
     }
 
-    public static RaidSpawnData load(CompoundTag tag) {
+    public static RaidSpawnData load(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         RaidSpawnData data = new RaidSpawnData();
         ListTag spawnsList = tag.getList(SPAWNS_KEY, Tag.TAG_COMPOUND);
         for (int i = 0; i < spawnsList.size(); i++) {
             CompoundTag entryTag = spawnsList.getCompound(i);
             try {
                 String name = entryTag.getString(NAME_KEY);
-                BlockPos pos = NbtUtils.readBlockPos(entryTag.getCompound(POS_KEY));
+                BlockPos pos = readPosition(entryTag, POS_KEY);
                 data.spawns.add(new SpawnEntry(name, pos));
             } catch (Exception ignored) {
             }
@@ -59,7 +59,7 @@ public class RaidSpawnData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         ListTag spawnsList = new ListTag();
         for (SpawnEntry entry : spawns) {
             CompoundTag entryTag = new CompoundTag();
@@ -151,4 +151,11 @@ public class RaidSpawnData extends SavedData {
     public record SpawnEntry(String name, BlockPos pos) {}
 
     public record CooldownEntry(long until, long lastProcessed) {}
+    private static BlockPos readPosition(CompoundTag tag, String key) {
+        if (tag.contains(key, Tag.TAG_COMPOUND)) {
+            CompoundTag pos = tag.getCompound(key);
+            return new BlockPos(pos.getInt("X"), pos.getInt("Y"), pos.getInt("Z"));
+        }
+        return NbtUtils.readBlockPos(tag, key).orElseThrow();
+    }
 }

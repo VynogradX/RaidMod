@@ -933,33 +933,25 @@ public class RaidCommands {
     }
 
     public static RaidDoorData getRaidDoorData(ServerLevel level) {
-        return level.getChunkSource().getDataStorage().computeIfAbsent(
-                RaidDoorData::load,
-                RaidDoorData::new,
+        return level.getChunkSource().getDataStorage().computeIfAbsent(new net.minecraft.world.level.saveddata.SavedData.Factory<>(RaidDoorData::new, RaidDoorData::load, null),
                 RaidDoorData.getDataId()
         );
     }
 
     public static RaidSpawnData getRaidSpawnData(ServerLevel level) {
-        return level.getChunkSource().getDataStorage().computeIfAbsent(
-                RaidSpawnData::load,
-                RaidSpawnData::new,
+        return level.getChunkSource().getDataStorage().computeIfAbsent(new net.minecraft.world.level.saveddata.SavedData.Factory<>(RaidSpawnData::new, RaidSpawnData::load, null),
                 RaidSpawnData.getDataId()
         );
     }
 
     public static RaidPlayerData getRaidPlayerData(ServerLevel level) {
-        return level.getChunkSource().getDataStorage().computeIfAbsent(
-                RaidPlayerData::load,
-                RaidPlayerData::new,
+        return level.getChunkSource().getDataStorage().computeIfAbsent(new net.minecraft.world.level.saveddata.SavedData.Factory<>(RaidPlayerData::new, RaidPlayerData::load, null),
                 RaidPlayerData.getDataId()
         );
     }
 
     public static RaidVariableExitsData getRaidVariableExitsData(ServerLevel level) {
-        return level.getChunkSource().getDataStorage().computeIfAbsent(
-                RaidVariableExitsData::load,
-                RaidVariableExitsData::new,
+        return level.getChunkSource().getDataStorage().computeIfAbsent(new net.minecraft.world.level.saveddata.SavedData.Factory<>(RaidVariableExitsData::new, RaidVariableExitsData::load, null),
                 RaidVariableExitsData.getDataId()
         );
     }

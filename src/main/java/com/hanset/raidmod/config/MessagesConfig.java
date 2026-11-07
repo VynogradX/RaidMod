@@ -2,7 +2,7 @@ package com.hanset.raidmod.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.fabricmc.loader.api.FabricLoader;
+import net.neoforged.fml.loading.FMLPaths;
 import net.minecraft.network.chat.Component;
 
 import java.io.*;
@@ -129,7 +129,7 @@ public class MessagesConfig {
     );
 
     public static Path getConfigPath() {
-        return FabricLoader.getInstance().getConfigDir().resolve("raidmod_messages.json");
+        return FMLPaths.CONFIGDIR.get().resolve("raidmod_messages.json");
     }
 
     public static MessagesConfig get() {

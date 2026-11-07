@@ -32,7 +32,7 @@ import java.util.UUID;
 public class RaidScoreboard {
 
     private static final String OBJECTIVE_ID = "raidmod_exits";
-    private static final int SIDEBAR_SLOT = 1;
+    private static final net.minecraft.world.scores.DisplaySlot SIDEBAR_SLOT = net.minecraft.world.scores.DisplaySlot.SIDEBAR;
     private static final int MAX_LINES = 14;
     private static final int MAX_HOLDER_LENGTH = 60;
 
@@ -90,7 +90,7 @@ public class RaidScoreboard {
                 OBJECTIVE_ID,
                 ObjectiveCriteria.DUMMY,
                 com.hanset.raidmod.config.MessagesConfig.msg("scoreboard.title"),
-                ObjectiveCriteria.RenderType.INTEGER
+                ObjectiveCriteria.RenderType.INTEGER, false, null
         );
 
         List<ScoreLine> lines = new ArrayList<>();
@@ -146,12 +146,7 @@ public class RaidScoreboard {
         Set<String> previous = sentHolders.getOrDefault(playerId, Set.of());
         for (String oldHolder : previous) {
             if (!currentHolders.contains(oldHolder)) {
-                player.connection.send(new ClientboundSetScorePacket(
-                        ServerScoreboard.Method.REMOVE,
-                        OBJECTIVE_ID,
-                        oldHolder,
-                        0
-                ));
+                player.connection.send(new net.minecraft.network.protocol.game.ClientboundResetScorePacket(oldHolder, OBJECTIVE_ID));
             }
         }
 
@@ -164,10 +159,9 @@ public class RaidScoreboard {
 
         for (ScoreLine line : lines) {
             player.connection.send(new ClientboundSetScorePacket(
-                    ServerScoreboard.Method.CHANGE,
-                    OBJECTIVE_ID,
                     line.holder(),
-                    line.score()
+                    OBJECTIVE_ID,
+                    line.score(), java.util.Optional.empty(), java.util.Optional.empty()
             ));
         }
         sentHolders.put(playerId, currentHolders);
@@ -180,7 +174,7 @@ public class RaidScoreboard {
                 OBJECTIVE_ID,
                 ObjectiveCriteria.DUMMY,
                 net.minecraft.network.chat.Component.literal(""),
-                ObjectiveCriteria.RenderType.INTEGER
+                ObjectiveCriteria.RenderType.INTEGER, false, null
         );
         player.connection.send(new ClientboundSetObjectivePacket(dummyObjective, ClientboundSetObjectivePacket.METHOD_REMOVE));
         Objective serverSidebar = server.getScoreboard().getDisplayObjective(SIDEBAR_SLOT);
@@ -200,7 +194,7 @@ public class RaidScoreboard {
 
     private static void addEntry(Scoreboard scoreboard, Objective objective, List<ScoreLine> lines,
                                  String holder, int scoreValue) {
-        scoreboard.getOrCreatePlayerScore(holder, objective).setScore(scoreValue);
+
         lines.add(new ScoreLine(holder, scoreValue));
     }
 

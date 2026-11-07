@@ -180,7 +180,7 @@ public class RaidTimer {
 
     private static CustomBossEvent getOrCreateBossBar(MinecraftServer server, RaidEntry raid, UUID playerId) {
         if (raid.bossBar == null) {
-            ResourceLocation id = new ResourceLocation(RaidMod.MOD_ID, "raid_" + playerId);
+            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(RaidMod.MOD_ID, "raid_" + playerId);
             raid.bossBar = server.getCustomBossEvents().create(id, com.hanset.raidmod.config.MessagesConfig.msg("raid.bossbar_title"));
             raid.bossBar.setColor(net.minecraft.world.BossEvent.BossBarColor.RED);
             raid.bossBar.setOverlay(net.minecraft.world.BossEvent.BossBarOverlay.PROGRESS);

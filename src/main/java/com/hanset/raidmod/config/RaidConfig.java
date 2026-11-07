@@ -2,7 +2,7 @@ package com.hanset.raidmod.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.fabricmc.loader.api.FabricLoader;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -71,7 +71,7 @@ public class RaidConfig {
     public boolean hide_nether_nametags = true;
 
     public static Path getConfigPath() {
-        return FabricLoader.getInstance().getConfigDir().resolve("raidmod.json");
+        return FMLPaths.CONFIGDIR.get().resolve("raidmod.json");
     }
 
     public static RaidConfig get() {

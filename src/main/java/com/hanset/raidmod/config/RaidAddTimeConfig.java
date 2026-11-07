@@ -2,7 +2,7 @@ package com.hanset.raidmod.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.fabricmc.loader.api.FabricLoader;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -30,7 +30,7 @@ public class RaidAddTimeConfig {
     public Map<String, Integer> player_extra_seconds = new HashMap<>();
 
     public static Path getConfigPath() {
-        return FabricLoader.getInstance().getConfigDir().resolve("raidmod_addtime.json");
+        return FMLPaths.CONFIGDIR.get().resolve("raidmod_addtime.json");
     }
 
     public static RaidAddTimeConfig get() {

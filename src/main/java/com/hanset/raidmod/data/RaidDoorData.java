@@ -31,7 +31,7 @@ public class RaidDoorData extends SavedData {
         super();
     }
 
-    public static RaidDoorData load(CompoundTag tag) {
+    public static RaidDoorData load(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         RaidDoorData data = new RaidDoorData();
         java.util.Set<BlockPos> seen = new java.util.HashSet<>();
         boolean hasStaticDoor = false;
@@ -39,7 +39,7 @@ public class RaidDoorData extends SavedData {
         for (int i = 0; i < doorsList.size(); i++) {
             CompoundTag entryTag = doorsList.getCompound(i);
             try {
-                BlockPos pos = NbtUtils.readBlockPos(entryTag.getCompound(POS_KEY));
+                BlockPos pos = readPosition(entryTag, POS_KEY);
                 if (seen.contains(pos) || seen.contains(pos.above()) || seen.contains(pos.below())) continue;
                 seen.add(pos);
                 seen.add(pos.above());
@@ -61,7 +61,7 @@ public class RaidDoorData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         ListTag doorsList = new ListTag();
         for (DoorEntry entry : doors) {
             CompoundTag entryTag = new CompoundTag();
@@ -179,5 +179,12 @@ public class RaidDoorData extends SavedData {
         public DoorEntry(BlockPos pos, String name, int radius, int exitTime, int requiredPlayers) {
             this(pos, name, radius, exitTime, requiredPlayers, false);
         }
+    }
+    private static BlockPos readPosition(CompoundTag tag, String key) {
+        if (tag.contains(key, Tag.TAG_COMPOUND)) {
+            CompoundTag pos = tag.getCompound(key);
+            return new BlockPos(pos.getInt("X"), pos.getInt("Y"), pos.getInt("Z"));
+        }
+        return NbtUtils.readBlockPos(tag, key).orElseThrow();
     }
 }

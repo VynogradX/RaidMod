@@ -28,7 +28,7 @@ public class RaidPlayerData extends SavedData {
         super();
     }
 
-    public static RaidPlayerData load(CompoundTag tag) {
+    public static RaidPlayerData load(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         RaidPlayerData data = new RaidPlayerData();
         ListTag list = tag.getList(PLAYERS_KEY, Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {
@@ -55,7 +55,7 @@ public class RaidPlayerData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         ListTag list = new ListTag();
         for (Map.Entry<UUID, Long> e : playersInRaid.entrySet()) {
             CompoundTag entry = new CompoundTag();

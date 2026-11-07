@@ -1,7 +1,8 @@
 package com.hanset.raidmod;
 
 import com.hanset.raidmod.data.RaidStatsData;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,7 +16,7 @@ import net.minecraft.world.level.Level;
 public class RaidStatsTracker {
 
     public static void register() {
-        ServerLivingEntityEvents.AFTER_DEATH.register(RaidStatsTracker::onEntityDeath);
+        NeoForge.EVENT_BUS.addListener((LivingDeathEvent event) -> onEntityDeath(event.getEntity(), event.getSource()));
     }
 
     /** Вызвать при входе в рейд. */
@@ -92,9 +93,7 @@ public class RaidStatsTracker {
     public static RaidStatsData getStatsData(MinecraftServer server) {
         ServerLevel overworld = server.getLevel(Level.OVERWORLD);
         if (overworld == null) return null;
-        return overworld.getChunkSource().getDataStorage().computeIfAbsent(
-                RaidStatsData::load,
-                RaidStatsData::new,
+        return overworld.getChunkSource().getDataStorage().computeIfAbsent(new net.minecraft.world.level.saveddata.SavedData.Factory<>(RaidStatsData::new, RaidStatsData::load, null),
                 RaidStatsData.getDataId()
         );
     }

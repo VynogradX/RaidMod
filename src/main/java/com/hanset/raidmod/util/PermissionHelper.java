@@ -1,40 +1,33 @@
 package com.hanset.raidmod.util;
 
-import java.lang.reflect.Method;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
 
-/**
- * Проверка пермишенов через fabric-permissions-api (LuckPerms).
- * Использует reflection — мод работает без LuckPerms, при наличии — проверяет пермишены.
- */
 public final class PermissionHelper {
-
-    /** Пермишен для обхода кулдауна на /expedition (для донатеров). */
     public static final String RAID_COOLDOWN_BYPASS = "raidmod.cooldown.bypass";
-
-    /** Пермишен для всех админских команд (запасной — OP 2). */
     public static final String ADMIN = "raidmod.admin";
 
-    /** Проверяет право на админские команды: OP 2 или raidmod.admin. */
-    public static boolean hasAdminPermission(net.minecraft.commands.CommandSourceStack source) {
-        return source.hasPermission(2)
-                || (source.getEntity() instanceof net.minecraft.server.level.ServerPlayer p && hasPermission(p, ADMIN));
+    public static boolean hasAdminPermission(CommandSourceStack source) {
+        return source.hasPermission(2) || source.getEntity() instanceof ServerPlayer player && hasPermission(player, ADMIN);
     }
 
-    private static Boolean permissionsApiAvailable = null;
-
-    /**
-     * Проверяет, есть ли у игрока пермишен. Работает с LuckPerms через fabric-permissions-api.
-     * @return true если пермишен есть, false если нет или API недоступен
-     */
-    public static boolean hasPermission(net.minecraft.server.level.ServerPlayer player, String permission) {
-        if (permissionsApiAvailable == Boolean.FALSE) return false;
+    public static boolean hasPermission(ServerPlayer player, String permission) {
         try {
-            Class<?> permClass = Class.forName("me.lucko.fabric.api.permissions.v0.Permissions");
-            Method check = permClass.getMethod("check", net.minecraft.world.entity.Entity.class, String.class);
-            permissionsApiAvailable = true;
-            return Boolean.TRUE.equals(check.invoke(null, player, permission));
-        } catch (Throwable e) {
-            permissionsApiAvailable = false;
+            Class<?> provider = Class.forName("net.luckperms.api.LuckPermsProvider");
+            Object api = provider.getMethod("get").invoke(null);
+            Class<?> apiType = Class.forName("net.luckperms.api.LuckPerms");
+            Object manager = apiType.getMethod("getUserManager").invoke(api);
+            Class<?> managerType = Class.forName("net.luckperms.api.model.user.UserManager");
+            Object user = managerType.getMethod("getUser", java.util.UUID.class).invoke(manager, player.getUUID());
+            if (user == null) return false;
+            Class<?> userType = Class.forName("net.luckperms.api.model.user.User");
+            Object cached = userType.getMethod("getCachedData").invoke(user);
+            Class<?> cachedType = Class.forName("net.luckperms.api.cacheddata.CachedDataManager");
+            Object permissions = cachedType.getMethod("getPermissionData").invoke(cached);
+            Class<?> permissionType = Class.forName("net.luckperms.api.cacheddata.CachedPermissionData");
+            Object result = permissionType.getMethod("checkPermission", String.class).invoke(permissions, permission);
+            return (boolean) Class.forName("net.luckperms.api.util.Tristate").getMethod("asBoolean").invoke(result);
+        } catch (ReflectiveOperationException | LinkageError | IllegalStateException e) {
             return false;
         }
     }

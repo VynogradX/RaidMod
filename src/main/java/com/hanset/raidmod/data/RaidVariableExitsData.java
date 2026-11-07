@@ -31,20 +31,21 @@ public class RaidVariableExitsData extends SavedData {
         super();
     }
 
-    public static RaidVariableExitsData load(CompoundTag tag) {
+    public static RaidVariableExitsData load(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         RaidVariableExitsData data = new RaidVariableExitsData();
         if (tag.contains(POSITIONS_KEY, Tag.TAG_LIST)) {
             net.minecraft.nbt.ListTag list = tag.getList(POSITIONS_KEY, Tag.TAG_COMPOUND);
             for (int i = 0; i < list.size(); i++) {
-                data.positions.add(NbtUtils.readBlockPos(list.getCompound(i)));
+                CompoundTag pos = list.getCompound(i);
+                data.positions.add(new BlockPos(pos.getInt("X"), pos.getInt("Y"), pos.getInt("Z")));
             }
         } else {
             // Миграция старого формата с двумя фиксированными выходами.
             if (tag.contains(POS1_KEY)) {
-                data.positions.add(NbtUtils.readBlockPos(tag.getCompound(POS1_KEY)));
+                data.positions.add(readPosition(tag, POS1_KEY));
             }
             if (tag.contains(POS2_KEY)) {
-                data.positions.add(NbtUtils.readBlockPos(tag.getCompound(POS2_KEY)));
+                data.positions.add(readPosition(tag, POS2_KEY));
             }
         }
         data.setTimeMs = tag.getLong(SET_TIME_KEY);
@@ -52,10 +53,14 @@ public class RaidVariableExitsData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
         for (BlockPos position : positions) {
-            list.add(NbtUtils.writeBlockPos(position));
+            CompoundTag pos = new CompoundTag();
+            pos.putInt("X", position.getX());
+            pos.putInt("Y", position.getY());
+            pos.putInt("Z", position.getZ());
+            list.add(pos);
         }
         tag.put(POSITIONS_KEY, list);
         tag.putLong(SET_TIME_KEY, setTimeMs);
@@ -89,5 +94,12 @@ public class RaidVariableExitsData extends SavedData {
 
     public static String getDataId() {
         return DATA_ID;
+    }
+    private static BlockPos readPosition(CompoundTag tag, String key) {
+        if (tag.contains(key, Tag.TAG_COMPOUND)) {
+            CompoundTag pos = tag.getCompound(key);
+            return new BlockPos(pos.getInt("X"), pos.getInt("Y"), pos.getInt("Z"));
+        }
+        return NbtUtils.readBlockPos(tag, key).orElseThrow();
     }
 }
