@@ -43,14 +43,15 @@ public class RaidAddTimeConfig {
     public static RaidAddTimeConfig load() {
         Path path = getConfigPath();
         if (Files.exists(path)) {
+            RaidAddTimeConfig config = null;
             try (Reader reader = new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8)) {
-                RaidAddTimeConfig config = GSON.fromJson(reader, RaidAddTimeConfig.class);
-                if (config != null && config.player_extra_seconds != null) {
-                    config.save();
-                    return config;
-                }
+                config = GSON.fromJson(reader, RaidAddTimeConfig.class);
             } catch (Exception e) {
                 org.slf4j.LoggerFactory.getLogger("raidmod").error("Failed to read RaidMod extra-time config {}", path, e);
+            }
+            if (config != null && config.player_extra_seconds != null) {
+                config.save();
+                return config;
             }
         }
         RaidAddTimeConfig config = new RaidAddTimeConfig();

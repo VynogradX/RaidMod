@@ -84,15 +84,16 @@ public class RaidConfig {
     public static RaidConfig load() {
         Path path = getConfigPath();
         if (Files.exists(path)) {
+            RaidConfig config = null;
             try (Reader reader = new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8)) {
-                RaidConfig config = GSON.fromJson(reader, RaidConfig.class);
-                if (config != null) {
-                    config.validate();
-                    config.save();
-                    return config;
-                }
+                config = GSON.fromJson(reader, RaidConfig.class);
             } catch (Exception e) {
                 org.slf4j.LoggerFactory.getLogger("raidmod").error("Failed to read RaidMod config {}", path, e);
+            }
+            if (config != null) {
+                config.validate();
+                config.save();
+                return config;
             }
         }
         RaidConfig config = new RaidConfig();
